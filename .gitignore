@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+venv/
+*.pyc
+
+# Environment
+.env
+
+# Vector store
+vector_store/
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log

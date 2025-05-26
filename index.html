@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Chat RAG SENAI - Assistente PDF Inteligente</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    background-color: #202123;
+    color: #e6e6e6;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  /* Barra lateral */
+  #sidebar {
+    width: 280px;
+    background-color: #202123;
+    border-right: 1px solid #3a3b42;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+  }
+  #sidebar h2 {
+    margin-top: 0;
+    color: #58a6ff;
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  #sidebar p {
+    font-size: 0.9rem;
+    line-height: 1.4;
+    color: #bbb;
+    white-space: pre-line;
+  }
+
+  /* Área do chat */
+  #chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: #2a2b32;
+  }
+
+  #chat {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #555 transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  #chat::-webkit-scrollbar {
+    width: 8px;
+  }
+  #chat::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border-radius: 4px;
+  }
+
+  .msg {
+    max-width: 80%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    display: inline-block;
+    clear: both;
+  }
+
+  .user {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 0;
+  }
+
+  .bot {
+    background-color: #444652;
+    color: #e6e6e6;
+    align-self: flex-start;
+    border-bottom-left-radius: 0;
+  }
+
+  /* Fontes (trechos usados) */
+  .sources {
+    font-size: 0.8rem;
+    color: #aaa;
+    background-color: #3a3b42;
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-top: 4px;
+    border-left: 3px solid #58a6ff;
+  }
+
+  /* Formulário */
+  #form {
+    display: flex;
+    padding: 15px 20px;
+    border-top: 1px solid #3a3b42;
+    background-color: #202123;
+  }
+  #inputPrompt {
+    flex-grow: 1;
+    padding: 12px 14px;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: #3a3b42;
+    color: #e6e6e6;
+  }
+  #inputPrompt:focus {
+    outline: 2px solid #58a6ff;
+  }
+  #sendBtn {
+    margin-left: 12px;
+    background-color: #58a6ff;
+    border: none;
+    border-radius: 8px;
+    padding: 0 22px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  #sendBtn:hover:not(:disabled) {
+    background-color: #1c6ed5;
+  }
+  #sendBtn:disabled {
+    background-color: #3a3b42;
+    cursor: not-allowed;
+  }
+
+  /* Estilo para texto do bot */
+  .bot strong {
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+  <div id="sidebar" role="complementary" aria-label="Informações sobre o assistente">
+    <h2>Assistente SENAI RAG</h2>
+    <p>
+      Olá! Eu sou seu assistente inteligente para documentos SENAI.<br><br>
+      Funcionalidades:<br>
+      - Respostas baseadas no conteúdo exato do PDF<br>
+      - Identificação dos trechos usados<br>
+      - Suporte a documentos grandes<br><br>
+      Digite sua pergunta no chat à direita.
+    </p>
+  </div>
+
+  <section id="chat-container" role="main">
+    <div id="chat" aria-live="polite" aria-relevant="additions"></div>
+    <form id="form" autocomplete="off" aria-label="Formulário de envio de perguntas">
+      <input id="inputPrompt" type="text" placeholder="Digite sua pergunta..." required aria-required="true" aria-describedby="sendBtn" />
+      <button id="sendBtn" type="submit" aria-label="Enviar pergunta">Enviar</button>
+    </form>
+  </section>
+
+<script>
+  const chat = document.getElementById('chat');
+  const form = document.getElementById('form');
+  const inputPrompt = document.getElementById('inputPrompt');
+  const sendBtn = document.getElementById('sendBtn');
+
+  function appendMessage(text, className, sources = null) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'msg ' + className;
+
+    if (className === 'bot') {
+      const htmlText = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      msgDiv.innerHTML = htmlText;
+    } else {
+      msgDiv.textContent = text;
+    }
+
+    chat.appendChild(msgDiv);
+
+    // Adiciona fontes se existirem
+    if (sources && sources.length > 0) {
+      const sourcesDiv = document.createElement('div');
+      sourcesDiv.className = 'sources';
+      sourcesDiv.innerHTML = `🔍 Baseado em ${sources.length} trecho(s) do PDF:`;
+      chat.appendChild(sourcesDiv);
+    }
+
+    chat.scrollTop = chat.scrollHeight;
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const pergunta = inputPrompt.value.trim();
+    if (!pergunta) return;
+
+    appendMessage(pergunta, 'user');
+    inputPrompt.value = '';
+    sendBtn.disabled = true;
+
+    try {
+      const res = await fetch('http://localhost:5000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: pergunta }),
+      });
+      const data = await res.json();
+      
+      if (data.response) {
+        appendMessage(data.response, 'bot', data.sources);
+      } else if (data.error) {
+        appendMessage(`Erro: ${data.error}`, 'bot');
+      } else {
+        appendMessage('Erro: resposta inesperada do servidor.', 'bot');
+      }
+    } catch (err) {
+      appendMessage('Erro na conexão com o servidor.', 'bot');
+    }
+    sendBtn.disabled = false;
+    inputPrompt.focus();
+  });
+
+  // Mensagem inicial
+  function mensagemInicial() {
+    const textoInicial = `**Olá!** Eu sou seu assistente SENAI com RAG avançado. 
+Agora eu posso:
+- Responder com base nos trechos **mais relevantes** do PDF
+- Mostrar quais partes do documento foram usadas
+- Garantir respostas mais **precisas e contextualizadas**
+
+Experimente perguntar sobre qualquer tópico do documento!`;
+    appendMessage(textoInicial, 'bot');
+  }
+
+  window.onload = () => {
+    mensagemInicial();
+    inputPrompt.focus();
+  };
+</script>
+</body>
+</html>
