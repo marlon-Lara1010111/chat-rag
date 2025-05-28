@@ -1,11 +1,12 @@
 
+# 🤖 ChatRAG PDF Bot
 
-# 🤖 ChatRAG PDF Bot  
 **Transforme seus documentos PDF em assistentes inteligentes que respondem suas dúvidas na hora!**
 
 ---
 
 ## ✨ Visão Geral
+
 > **Atenção:** Este projeto utiliza como exemplo o arquivo `empresa_info.pdf`, baseado em um material do SENAI, pois sou estudante da instituição.  
 > Sinta-se à vontade para **substituí-lo por qualquer outro PDF**! O bot se adapta automaticamente ao conteúdo que você fornecer. 📄✨
 
@@ -24,13 +25,13 @@ Além disso, ele:
 
 | Tecnologia                 | Função                                      |
 |---------------------------|---------------------------------------------|
-| **Python 3.10+**           | Linguagem principal                         |
-| **Flask**                  | Criação da API web                          |
-| **Langchain**              | Orquestração do pipeline de RAG            |
-| **FAISS**                  | Banco de vetores para buscas rápidas       |
-| **HuggingFace Embeddings**| Transformação do texto em vetores          |
-| **Ollama**                 | Execução local do modelo de linguagem      |
-| **PyPDF2**                 | Leitura e extração do conteúdo do PDF      |
+| **Python 3.10+**          | Linguagem principal                         |
+| **Flask**                 | Criação da API web                          |
+| **Langchain**             | Orquestração do pipeline de RAG            |
+| **FAISS**                 | Banco de vetores para buscas rápidas       |
+| **HuggingFace Embeddings**| Transformação do texto em vetores           |
+| **Ollama**                | Execução local do modelo de linguagem      |
+| **PyPDF2**                | Leitura e extração do conteúdo do PDF      |
 
 ---
 
@@ -53,16 +54,14 @@ Rodar o **ChatRAG PDF Bot** no seu computador é simples — em poucos minutos v
 
 ### 🔧 Passos para rodar localmente:
 
-#### 1. Instale o [Ollama](https://ollama.com/) e rode o modelo `llama3`:
+#### 1. Instale o [Ollama](https://ollama.com/) e rode o modelo `llama3:8b`:
 
 ```bash
-ollama run llama3
+ollama pull llama3:8b
+ollama run llama3:8b
 ```
-
-> Esse modelo será responsável por gerar as respostas baseadas no conteúdo do PDF.  
-> Mantenha o processo rodando em um terminal separado.
-
----
+> ⚠️ Esse modelo será responsável por gerar as respostas baseadas no conteúdo do PDF.  
+> Mantenha este processo rodando em um terminal separado.
 
 #### 2. Clone o repositório:
 
@@ -71,27 +70,21 @@ git clone https://github.com/seu-usuario/chatrag-pdf-bot.git
 cd chatrag-pdf-bot
 ```
 
----
+#### 3. Crie e ative um ambiente virtual (opcional, mas altamente recomendado):
 
-#### 3. Crie e ative um ambiente virtual (opcional, mas recomendado):
+- No Windows:
 
 ```bash
 python -m venv venv
-```
-
-**Windows:**
-
-```bash
 venv\Scripts\activate
 ```
 
-**macOS/Linux:**
+- No macOS/Linux:
 
 ```bash
+python -m venv venv
 source venv/bin/activate
 ```
-
----
 
 #### 4. Instale as dependências:
 
@@ -99,23 +92,16 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Ou, se preferir instalar manualmente:
+> Ou, se preferir instalar manualmente:
 
 ```bash
 pip install flask langchain faiss-cpu PyPDF2
 ```
 
----
-
 #### 5. Coloque seu PDF na pasta do projeto
 
-O repositório já vem com um arquivo de exemplo chamado `empresa_info.pdf`.
-
-> 💡 **Sobre o arquivo `empresa_info.pdf`**  
-> Ele foi usado como exemplo porque sou estudante do **SENAI** e utilizei um material da instituição para testar o projeto.  
-> Mas você pode substituir por qualquer outro PDF que quiser — o bot se adapta automaticamente ao conteúdo do novo documento!
-
----
+> 💡 O repositório já vem com um arquivo de exemplo chamado `empresa_info.pdf`, baseado em um material do SENAI que utilizei para testes.  
+> Você pode substituir por qualquer PDF que quiser — o bot irá se adaptar automaticamente ao conteúdo do seu documento!
 
 #### 6. Execute o bot:
 
@@ -123,6 +109,4 @@ O repositório já vem com um arquivo de exemplo chamado `empresa_info.pdf`.
 python app.py
 ```
 
-A aplicação será iniciada, e você poderá interagir com o chatbot via terminal ou API, dependendo da implementação atual.
-
----
+> 🚀 A aplicação será iniciada e você poderá interagir com o chatbot via terminal ou API, conforme a implementação atual.
