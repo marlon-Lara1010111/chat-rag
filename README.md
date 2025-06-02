@@ -5,6 +5,9 @@
 
 ---
 
+![image](https://github.com/user-attachments/assets/de3e3126-0f7f-4170-b068-a3499bf951c9)
+
+
 ## ✨ Visão Geral
 
 > **Atenção:** Este projeto utiliza como exemplo o arquivo `empresa_info.pdf`, baseado em um material do SENAI, pois sou estudante da instituição.  
@@ -34,6 +37,8 @@ Além disso, ele:
 | **PyPDF2**                | Leitura e extração do conteúdo do PDF      |
 
 ---
+
+
 
 ## 🎯 Por que criei este projeto?
 
